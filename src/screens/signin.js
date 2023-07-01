@@ -1,11 +1,31 @@
-import { Button, StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native';
+import { Button, StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import React, {useState} from 'react';
+// import { UseSelector } from 'react-redux';
+import CustomText from '../components/CustomText'
+import {useFonts} from 'expo-font'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
 export default function SignIn({ navigation }) {
-    const [email, setEmail] = useState('');
+
+
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
+    const handleUsernameChange = (text) => {
+      setUsername(text);
+    };
+  
+    const handlePasswordChange = (text) => {
+      setPassword(text);
+    };
+
+    const [fontsLoaded] = useFonts({
+      'YsabeauSC': require('../../assets/fonts/YsabeauSC-VariableFont_wght.ttf')
+    })
+  
+
 
     // const onBuffer=() =>{
     //     console.log("on buffering==>>>", data)
@@ -14,20 +34,27 @@ export default function SignIn({ navigation }) {
     //     console.log("error raised===>>>",data)
     // }
     
-    const handleEmailChange = (text) => {
-        setEmail(text)
-    };
-    const handlePasswordChange = (text) => {
-        setPassword(text)
-    }
 
-    const handleSignIn = () =>{
-        // Perform sign-in logic with email and password
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Navigation logic for signing in
-    navigation.navigate('mainpage');
+    const handleSignIn = async() =>{
+      try{
+        const storedUsername = await AsyncStorage.getItem('username')
+        const storedPassword = await AsyncStorage.getItem('password')
+
+        if (username === storedUsername && password === storedPassword){
+          console.log('User logged in', username)
+          navigation.navigate('mainpage')
+        }else{
+          console.log('Invalid credentials')
+          Alert.alert('Invalid credentials. Please try again.')
+        } 
+      }catch (error){
+        console.log('Error retieving data:', error)
+      }
   };
+
+  if (!fontsLoaded){
+    return null
+  }
 
 
   return (
@@ -36,15 +63,16 @@ export default function SignIn({ navigation }) {
     
       <TextInput 
         style={styles.input}
-        placeholder='Enter your email'
-        onChangeText={handleEmailChange}
-        value={email}
+        placeholder='Enter your username'
+        onChangeText={handleUsernameChange}
+        value={username}
       />
       <TextInput 
         style={styles.input}
         placeholder='Enter your password'
         onChangeText={handlePasswordChange}
         value={password}
+        secureTextEntry
       />
     
       <TouchableOpacity style={styles.buttonStyle} onPress={handleSignIn}>
