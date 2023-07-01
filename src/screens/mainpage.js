@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React from 'react'
+import React, {useEffect, useState} from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const Box = ({ imageSource, text, onPress }) => {
   return (
@@ -10,14 +12,46 @@ const Box = ({ imageSource, text, onPress }) => {
   );
 };
 
-const App = () => {
+const MainPage = () => {
+  const navigation = useNavigation();
+
+  const [username, setUsername] = useState('');
+
+  useEffect(()=> {
+    retrieveUsername();
+  }, []);
+
+  const retrieveUsername = async () => {
+    try {
+      const storedUsername = await AsyncStorage.getItem('username')
+      if (storedUsername !== null){
+        setUsername(storedUsername)
+      }
+    }catch (error){
+      console.log('Error retrieving username: ', error)
+    }
+  }
+
   const handleBoxPress = (boxId) => {
     console.log(`Box ${boxId} pressed`);
     // Perform desired action when a box is pressed
   };
 
+  const handleLogOut = async () => {
+    try{
+      await AsyncStorage.removeItem('username')
+      navigation.navigate('Home')
+    }catch (error){
+      console.log('Error logging out: ', error)
+    }
+  }
+
   return (
     <View style={styles.container}>
+
+      <Text style={styles.usernameText}>Hello {username} !</Text>
+    
+      
       <View style={styles.upperHalf}>
       <View style={styles.row}>
         <Box
@@ -44,7 +78,11 @@ const App = () => {
         />
       </View>
       </View>
+        <TouchableOpacity style={styles.buttonStyle} onPress={handleLogOut}>
+          <Text style={styles.textStyle}>Log Out</Text>
+        </TouchableOpacity>
     </View>
+    
   );
 };
 
@@ -59,7 +97,7 @@ const styles = StyleSheet.create({
     flex:1,
     justifyContent:'center',
     alignItems:'center',
-    marginBottom: 350,
+    marginBottom: 70,
   },
 
   row: {
@@ -83,6 +121,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  usernameText:{
+    position:'absolute',
+    top: 20,
+    bottom: 20,
+    left: 20,
+    fontSize:18,
+    fontWeight:'bold',
+  },
+  buttonStyle:{
+    backgroundColor: '#BD1616',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 20,
+    marginBottom: 50
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  // titlecontainer:{
+  //   marginBottom: 20,
+  //   marginTop: 20,
+  // }
 });
 
-export default App;
+export default MainPage;
