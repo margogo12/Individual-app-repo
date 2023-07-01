@@ -1,39 +1,64 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from 'react-native';
-import React, {useState} from 'react';
-// import Video from 'react-native-video'; 
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Alert } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 
 
 
 export default function SignUp({ navigation }) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
-    // const onBuffer=() =>{
-    //     console.log("on buffering==>>>", data)
-    // } 
-    // const videoError = (data) => {
-    //     console.log("error raised===>>>",data)
-    // }
+    const [username,setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [reenterPassword, setreenterPassword] = useState('')
+
+    useEffect(() => {
+      // Retrieve the stored email and password from AsyncStorage
+      retrieveData();
+    }, []);
+
+    const retrieveData = async () => {
+      try {
+        const storedUsername = await AsyncStorage.getItem('username');
+        const storedPassword = await AsyncStorage.getItem('password');
+        const reenterPassword= await AsyncStorage.getItem('resetPassword')
+  
+        if (storedUsername !== null) {
+          setUsername(storedUsername);
+        }
+        if (storedPassword !== null) {
+          setPassword(storedPassword);
+        }
+      } catch (error) {
+        console.log('Error retrieving data:', error);
+      }
+    };
+
     
-    const handleEmailChange = (text) => {
-        setEmail(text)
+    const handleUsernameChange = (text) => {
+      setUsername(text)
     };
     const handlePasswordChange = (text) => {
-        setPassword(text)
-    }
-    const onBuffer=(data) =>{
-      console.log("on buffering==>>", data)
-    }
-    const videoError =(data) => {
-      console.log('error raised==>>', data)
-    }
+      setPassword(text)
+    };
+    const handleReenterPasswordChange = (text) => {
+      setreenterPassword(text)
+    };
 
-    const handleSignIn = () =>{
-        // Perform sign-in logic with email and password
-    console.log('Email:', email);
-    console.log('Password:', password);
-    // Navigation logic for signing in
-    navigation.navigate('Home');
+    const handleSignIn = async () =>{
+
+      if (password !== reenterPassword){
+        Alert.alert ('The entered passwords do not match')
+        return
+      }
+      try{
+        await AsyncStorage.setItem('username',username)
+        await AsyncStorage.setItem('password',password)
+        console.log('User Data stored successfully')
+        navigation.navigate('signin')
+      } catch (error){
+        console.log('Error storing user data', error)
+      }   
+
   };
 
 
@@ -41,31 +66,12 @@ export default function SignUp({ navigation }) {
 
  
     <View style={styles.container}>
-      {/* <View style={styles.viedocontainer}>
-        <Video 
-  
-          ref={(ref) => {
-            this.player = ref
-          }}
-          source = {require('../../assets/video.mp4')}
-          onBuffer={onBuffer}
-          onError={videoError}
-          style={styles.backgroundVideo}
-        />
-      </View> */}
-    
-        {/* <Text style={styles.label}>Email</Text> */}
+
         <TextInput 
           style={styles.input}
-          placeholder='Enter your email'
-          onChangeText={handleEmailChange}
-          value={email}
-        />
-        <TextInput 
-          style={styles.input}
-          placeholder='Date of Birth(DD/MM/YY)'
-          onChangeText={handlePasswordChange}
-          value={password}
+          placeholder='Enter your username'
+          onChangeText={handleUsernameChange}
+          value={username}
         />
   
         {/* <Text style={styles.label}>Password</Text> */}
@@ -78,8 +84,8 @@ export default function SignUp({ navigation }) {
         <TextInput 
           style={styles.input}
           placeholder='Re-enter your password'
-          onChangeText={handlePasswordChange}
-          value={password}
+          onChangeText={handleReenterPasswordChange}
+          value={reenterPassword}
         />
       
     

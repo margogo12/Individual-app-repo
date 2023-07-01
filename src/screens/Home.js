@@ -1,8 +1,13 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
+import MyButton from '../components/MyButton';
+
+import { UseSelector, useSelector } from 'react-redux';
 
 
 export default function HomePage({ navigation }) {
+  let username=useSelector(s => s.username);
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
@@ -12,8 +17,9 @@ export default function HomePage({ navigation }) {
        />
       </View>
       
-      <Text style={styles.header}>Welcome to Your Inner Self</Text>
+      <Text style={styles.header}> Welcome to Your Inner Self</Text>
 
+      {/* <MyButton title='click me'></MyButton> */}
       <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.navigate('signin')}>
         <Text style={styles.textStyle}>SIGN IN</Text>
       </TouchableOpacity>
