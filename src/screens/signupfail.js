@@ -5,7 +5,7 @@ export default function SignUpFail({ navigation }) {
     <View style={styles.container}>
       <Text style={styles.header}>Opps</Text>
       <Text style={styles.textStyle}>We're sorry. Please come back when you reach 18 years old!</Text>
-      <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.buttonStyle} onPress={() => navigation.goBack('Home')}>
         <Text style={styles.textStyle}>Back to home page</Text>
       </TouchableOpacity>
     </View>
